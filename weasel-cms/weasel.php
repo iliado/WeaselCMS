@@ -3,6 +3,8 @@ if ( !defined('CMS_FOLDER') ) { header('Location: ../'); }
 
 header('Content-Type: text/html; charset=utf-8');
 
+//require_once '../config.php';
+
 function create_link($slug) {
 
 	if (!$slug) { return dirname($_SERVER['PHP_SELF']); }
@@ -30,7 +32,7 @@ function CMS_DATA() {
 
 	$_DATA = [];
 	$_DATA['version'] = $cms_version;
-	$_DATA['site'] = include $cms_folder . 'config.php';
+	$_DATA['site'] = include SITE_INFO;
 	$_DATA['site']['path'] = dirname($_SERVER['PHP_SELF']);
 
 	$_DATA['site']['url'] = 'http://' . $_SERVER['HTTP_HOST'] . dirname( $_SERVER['PHP_SELF'] );
@@ -40,7 +42,7 @@ function CMS_DATA() {
 		unset($_DATA['site']['pass']);
 
 	// Get all the existing data on to from the .dat file
-	$db_data = file( $cms_folder . $_DATA['site']['db'], FILE_IGNORE_NEW_LINES);
+	$db_data = file( SITE_PAGES, FILE_IGNORE_NEW_LINES);
 	$_DATA['pages']= array();
 	foreach ($db_data as $data_line) {
 		$_DATA['pages'][] = json_decode($data_line, true);
@@ -133,7 +135,7 @@ $xml_stuff = ['sitemap.xml', 'rss.xml'];
 if ( !empty($_GET['e']) && in_array($_GET['e'], $xml_stuff) ) {
 
 	$_CMS = CMS_DATA();
-	include 'weasel-cms/' . $_GET['e'] . '.php';
+	include CMS_FOLDER . $_GET['e'] . '.php';
 
 } elseif ( !empty($_GET['e']) ) {
 

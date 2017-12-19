@@ -1,6 +1,6 @@
 <?php
 
-define('CMS_FOLDER', 'weasel-cms/');
+require_once 'config.php';
 require_once CMS_FOLDER . 'weasel.php';
 
 ?>

@@ -32,7 +32,7 @@ Apache `mod_rewrite` module enabled is recommended but not a requirement.
 ### Installation
 1. Download the latest version of **Weasel CMS** from the GitHub repository : https://github.com/alterebro/WeaselCMS/releases/latest
 2. Upload the files to your PHP Server
-3. Change permissions to the following files / folder to make them writable: `config.php`, `db.dat`, `/files`.
+3. Change permissions to the following folders to make them writable: `/data`, `/files`.
 4. That's all, start using Weasel CMS.
 
 Default installation user/pass pair is :
@@ -40,7 +40,7 @@ Default installation user/pass pair is :
 	user : weasel
 	pass : weaselcms
 
-You can change this login details on the `config.php` file
+You can change this login details on the `/data/data.php` file
 
 
 --
@@ -89,7 +89,7 @@ All the elements that you can use when theming your website using Weasel CMS dat
 
 #### Adding extra variables
 
-On the `config.php` file, you can add more `'key' => 'value'` items to the returned array so you can access to them later on the main template. They will be encapsulated in the parent array `$_CMS['site']`
+On the `data/data.php` file, you can add more `'key' => 'value'` items to the returned array so you can access to them later on the main template. They will be encapsulated in the parent array `$_CMS['site']`
 
 For example, by adding at the end of the config array the new pair : `'my_var' => 'my_value'`
 
@@ -97,10 +97,8 @@ For example, by adding at the end of the config array the new pair : `'my_var' =
 <?php return array (
   'user' => 'weasel',
   'pass' => 'weaselcms',
-  'db' => 'data.dat',
   'site_language' => 'en',
   ...
-  'files_folder' => '../files',
   'my_var' => 'my_value',
 );
 ```

@@ -2,6 +2,8 @@
 session_start();
 header('Content-Type: text/html; charset=utf-8');
 
+require_once '../config.php';
+
 // ------------------
 // Utils:
 // -- Slugify (https://gist.github.com/craiga/2716157)
@@ -34,10 +36,10 @@ function get_message() {
 
 
 // Get the config file.
-$_c = include 'config.php';
+$_c = include SITE_INFO;
 
 // Get all the existing data on the db file.
-$db_data = file($_c['db'], FILE_IGNORE_NEW_LINES);
+$db_data = file(SITE_PAGES, FILE_IGNORE_NEW_LINES);
 $db = array();
 foreach ($db_data as $data_line) {
 	$db[] = json_decode($data_line, true);
@@ -95,7 +97,7 @@ if ( $_v['action'] == 'logout' ) {
 
 // Check for removing files.
 if ( $_v['block'] == 'files' && $_v['action'] == 'remove' && isset($_GET['file']) ) {
-	$the_file = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . $_c['files_folder']) . DIRECTORY_SEPARATOR . $_GET['file'];
+	$the_file = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . FILES_FOLDER . DIRECTORY_SEPARATOR . $_GET['file'];
 	if ( file_exists($the_file) ) {
 		unlink($the_file);
 	}
@@ -118,7 +120,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 		$_c['site_description'] = $_POST["site-description"];
 		$_c['site_keywords'] = $_POST["site-keywords"];
 		$_c['theme'] = $_POST["site-theme"];
-		file_put_contents('config.php', '<?php return ' . var_export($_c, true) . ';');
+		file_put_contents(SITE_INFO, '<?php return ' . var_export($_c, true) . ';');
 
 		set_message('Settings Changed');
 		header( 'Location: ' . $_SERVER['PHP_SELF'] );
@@ -159,7 +161,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 		if ( empty($error) ) {
 
 			$data = json_encode( $data );
-			file_put_contents($_c['db'], $data . PHP_EOL , FILE_APPEND);
+			file_put_contents(SITE_PAGES, $data . PHP_EOL , FILE_APPEND);
 
 			set_message('Page Created');
 			header( 'Location: ' . $_SERVER['PHP_SELF'] );
@@ -222,7 +224,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 				$output .= json_encode( $db_buffer_item ) . PHP_EOL;
 			}
 			$output .= json_encode( $data ) . PHP_EOL;
-			file_put_contents($_c['db'], $output , LOCK_EX);
+			file_put_contents(SITE_PAGES, $output , LOCK_EX);
 
 			set_message('Page edited successfully');
 			header( 'Location: ' . $_SERVER['PHP_SELF'] );
@@ -246,7 +248,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 				$output .= json_encode( $db_item ) . PHP_EOL;
 			}
 		}
-		file_put_contents($_c['db'], $output , LOCK_EX);
+		file_put_contents(SITE_PAGES, $output , LOCK_EX);
 
 		set_message('Page Removed');
 		header( 'Location: ' . $_SERVER['PHP_SELF'] );
@@ -261,7 +263,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 		) {
 
 		require_once 'lib/upload.php';
-		$root_folder = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . $_c['files_folder']);
+		$root_folder = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . '../' . FILES_FOLDER;
 		$upload = Upload::factory( '', $root_folder );
 		$upload->file($_FILES['fileupload-file']);
 		$upload->set_max_file_size(2);
@@ -487,7 +489,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 	<?php elseif ( ($_v['block']) == 'files' ) : ?>
 	<?php // FILES ------------------------- ?>
 	<?php
-		$uploaded_files = glob($_c['files_folder'] . '/*');
+		$uploaded_files = glob('../' . FILES_FOLDER . '*');
 		usort($uploaded_files, function($a, $b) {
 		    return filemtime($a) < filemtime($b);
 		});
@@ -513,8 +515,8 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 						<tbody>
 							<?php foreach($files_dir as $file) : ?>
 							<tr>
-								<td><i class="fa fa-image fa-fw"></i> <a href="<?php echo $_c['files_folder'] . DIRECTORY_SEPARATOR . $file; ?>"><?php echo basename($file); ?></td>
-								<td class="align-right"><i class="fa fa-clock-o fa-fw"></i> <?php echo date ("y-m-d @H:i:s", filemtime($_c['files_folder'] . DIRECTORY_SEPARATOR . $file)); ?></td>
+								<td><i class="fa fa-image fa-fw"></i> <a href="<?php echo FILES_FOLDER . $file; ?>"><?php echo basename($file); ?></td>
+								<td class="align-right"><i class="fa fa-clock-o fa-fw"></i> <?php echo date ("y-m-d @H:i:s", filemtime('../'.FILES_FOLDER . $file)); ?></td>
 								<td class="align-right"><a href="<?php echo $_SERVER['PHP_SELF'] . '?b=files&a=remove&file=' . basename($file); ?>" class="remove-file-button"><i class="fa fa-trash fa-fw"></i> Delete</a></td>
 							</tr>
 							<?php endforeach; ?>
